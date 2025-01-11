@@ -1,15 +1,14 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
-from io import BytesIO
+from flask import Flask, jsonify, request
 from helper import predict
+app = Flask(__name__)
 
-app = FastAPI()
+@app.route('/predict', methods=['POST'])
+def predict():
+    if request.method == 'POST':
+        file = request.files['file']
+        img_bytes = file.read()
+        pred_label = predict(img_bytes)
+        return jsonify({"label": f"{pred_label}"})
 
-@app.post("/predict/")
-async def predict_image(file: UploadFile = File(...)):
-    try:
-        contents = await file.read()
-        prediction_label = predict(BytesIO(contents))
-        return JSONResponse(content={"prediction": prediction_label}, status_code=200)
-    except Exception as e:
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+if __name__ == '__main__':
+    app.run()

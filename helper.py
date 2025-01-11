@@ -2,8 +2,11 @@ import torch
 from torch import nn
 from PIL import Image
 from torchvision import transforms
+import os
 
 LABELS = ['bak kut teh', 'chai tow kuay', 'cheng tng', 'Laksa', 'Mee siam', 'mixed vegetables', 'nasi lemak', 'Prawn Noodle', 'sliced fish soup', 'yong tau foo']
+
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "11JanModelV0.pth")
 
 class FoodModelV0(nn.Module):
   def __init__(self,
@@ -69,7 +72,7 @@ def preprocess_image(image_path):
     # Unsqueeze because model expects [Batch_size, C, H, W]
     return data_transform(img).unsqueeze(dim=0)
 
-def load_model(saved_model):
+def load_model(saved_model=MODEL_PATH):
    model = FoodModelV0(input_shape=3, # Number of Colour Channels
                       output_shape=10, # Number of classes
                       sample_X=torch.rand(32, 3, 32, 32),
@@ -79,7 +82,7 @@ def load_model(saved_model):
    return model
 
 def predict(image_path):
-   model = load_model("11JanModelV0.pth")
+   model = load_model()
    input = preprocess_image(image_path)
    label = model(input).softmax(dim=1).argmax(dim=1)
    return LABELS[label]

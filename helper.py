@@ -74,7 +74,7 @@ def load_model(saved_model):
                       output_shape=10, # Number of classes
                       sample_X=torch.rand(32, 3, 32, 32),
                       hidden_units=20)
-   model.load_state_dict(saved_model)
+   model.load_state_dict(torch.load(saved_model))
    model.eval()
    return model
 
